@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE stations [
+<!ELEMENT stations (geolocation, qTimeStamp, msg, station+)>
+<!ELEMENT geolocation EMPTY>
+<!ATTLIST geolocation lat CDATA #REQUIRED>
+<!ATTLIST geolocation long CDATA #REQUIRED>
+<!ELEMENT qTimeStamp (#PCDATA)>
+<!ELEMENT msg (#PCDATA)>
+<!ELEMENT station (county, municipality, dd, address, companyName, brand, geolocation, h24, phone+, fuel+)>
+<!ATTLIST station stationID CDATA #REQUIRED>
+<!ELEMENT county (#PCDATA)>
+<!ATTLIST county countyID CDATA #REQUIRED>
+<!ELEMENT municipality (#PCDATA)>
+<!ATTLIST municipality municipalityID CDATA #REQUIRED>
+<!ELEMENT dd (#PCDATA)>
+<!ATTLIST dd ddID CDATA #REQUIRED>
+<!ELEMENT address (#PCDATA)>
+<!ELEMENT companyName (#PCDATA)>
+<!ELEMENT brand (#PCDATA)>
+<!ATTLIST brand brandID CDATA #REQUIRED>
+<!ELEMENT h24 (#PCDATA)>
+<!ELEMENT phone (#PCDATA)>
+<!ELEMENT fuel (fuelTypeID, fuelName, price, priceTimeStamp)>
+<!ELEMENT fuelTypeID (#PCDATA)>
+<!ELEMENT fuelName (#PCDATA)>
+<!ELEMENT price (#PCDATA)>
+<!ELEMENT priceTimeStamp (#PCDATA)>
+]>
+
+<stations>
+<msg>Αναζήτηση πρατηρίων καυσίμων</msg>
+
+<station stationID="1">
+    <county countyID="C1">Αττική</county>
+    <municipality municipalityID="M1">Κηφισιά</municipality>
+    <dd ddID="D1">Κηφισιά</dd>
+    <address>Λεωφόρος Κηφισίας 15</address>
+    <companyName>Shell</companyName>
+    <brand brandID="01">Shell V-Power</brand>
+    <geolocation lat="38.0760" long="23.8215"/>
+    <h24>true</h24>
+    <phone>2101234567</phone>
+    <phone>2107654321</phone>
+    <fuel>
+    <fuelTypeID>FT001</fuelTypeID>
+    <fuelName>Unleaded 95</fuelName>
+    <price>1.85</price>
+    <priceTimeStamp>2023-10-05T14:30:00</priceTimeStamp>
+    </fuel>
+    <fuel>
+    <fuelTypeID>FT002</fuelTypeID>
+    <fuelName>Diesel</fuelName>
+    <price>1.75</price>
+    <priceTimeStamp>2023-10-05T14:30:00</priceTimeStamp>
+    </fuel>
+</station>
+
+<station stationID="2">
+    <county countyID="C2">Αττική</county>
+    <municipality municipalityID="M2">Γλυφάδα</municipality>
+    <dd ddID="D2">Γλυφάδα</dd>
+    <address>Λεωφόρος Βουλιαγμένης 45</address>
+    <companyName>BP</companyName>
+    <brand brandID="02">BP Ultimate</brand>
+    <geolocation lat="37.8625" long="23.7458"/>
+    <h24>false</h24>
+    <phone>2109876543</phone>
+    <fuel>
+    <fuelTypeID>FT003</fuelTypeID>
+    <fuelName>Premium 100</fuelName>
+    <price>2.10</price>
+    <priceTimeStamp>2023-10-05T14:30:00</priceTimeStamp>
+    </fuel>
+    <fuel>
+    <fuelTypeID>FT004</fuelTypeID>
+    <fuelName>LPG</fuelName>
+    <price>0.95</price>
+    <priceTimeStamp>2023-10-05T14:30:00</priceTimeStamp>
+    </fuel>
+    </station>
+</stations>

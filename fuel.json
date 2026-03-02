@@ -1,0 +1,40 @@
+{
+    "stations": {
+    
+    "msg": "Αναζήτηση πρατηρίων καυσίμων",
+    "station": [
+        {
+        "stationID": "1",
+        "county": { "countyID": "C1", "#text": "Αττική" },
+        "municipality": { "municipalityID": "M1", "#text": "Κηφισιά" },
+        "dd": { "ddID": "D1", "#text": "Κηφισιά" },
+        "address": "Λεωφόρος Κηφισίας 15",
+        "companyName": "Shell",
+        "brand": { "brandID": "01", "#text": "Shell V-Power" },
+        "geolocation": { "lat": "38.0760", "long": "23.8215" },
+        "h24": "true",
+        "phone": ["2101234567", "2107654321"],
+        "fuel": [
+            { "fuelTypeID": "FT001", "fuelName": "Unleaded 95", "price": "1.85", "priceTimeStamp": "2023-10-05T14:30:00" },
+            { "fuelTypeID": "FT002", "fuelName": "Diesel", "price": "1.75", "priceTimeStamp": "2023-10-05T14:30:00" }
+        ]
+        },
+        {
+        "stationID": "2",
+        "county": { "countyID": "C2", "#text": "Αττική" },
+        "municipality": { "municipalityID": "M2", "#text": "Γλυφάδα" },
+        "dd": { "ddID": "D2", "#text": "Γλυφάδα" },
+        "address": "Λεωφόρος Βουλιαγμένης 45",
+        "companyName": "BP",
+        "brand": { "brandID": "02", "#text": "BP Ultimate" },
+        "geolocation": { "lat": "37.8625", "long": "23.7458" },
+        "h24": "false",
+        "phone": ["2109876543"],
+        "fuel": [
+            { "fuelTypeID": "FT003", "fuelName": "Premium 100", "price": "2.10", "priceTimeStamp": "2023-10-05T14:30:00" },
+            { "fuelTypeID": "FT004", "fuelName": "LPG", "price": "0.95", "priceTimeStamp": "2023-10-05T14:30:00" }
+        ]
+        }
+    ]
+    }
+}

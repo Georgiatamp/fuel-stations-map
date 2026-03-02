@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8" />
+    <title>Fuel Stations</title>
+    <style>
+    #container {
+        display: flex; 
+        gap: 20px; 
+        padding: 15px; 
+    }
+    #leftDiv { 
+        width: 150px; 
+        padding: 15px 10px; 
+        background: #8ba3a4; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 4px 
+        rgba(0,0,0,0.1); 
+    }
+    #rightDiv { flex: 1; 
+        background: #8ba3a4; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 4px 
+        rgba(0,0,0,0.1); 
+        padding: 20px; 
+    }
+    button { 
+        margin-bottom: 10px; 
+        width: 100%; 
+        padding: 10px; 
+        background: #586d85; 
+        border-radius: 6px; 
+        color: white; 
+        border: none; 
+        cursor: pointer; 
+        transition: all 0.3s; 
+    }
+    button:hover { 
+        background: #55779b; 
+        transform: translateY(-1px); 
+    }
+    header { 
+        text-align: center; 
+        padding: 20px; 
+        background: #d9e2e2; 
+        border-bottom: 2px solid #586d85; }
+    h1 { 
+        margin: 0; 
+        color: #2c3e50; 
+    }
+    .station-card { 
+        background: #f5f5f5; 
+        border-radius: 10px; 
+        padding: 15px; 
+        margin-bottom: 20px; 
+        box-shadow: 0 2px 5px  rgba(0,0,0,0.1); 
+    }
+    .station-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 15px; 
+    }
+    .h24-tag { 
+        background: #4CAF50; 
+        color: white; 
+        padding: 5px 10px; 
+        border-radius: 15px; 
+        font-size: 0.9em; 
+    }
+    .detail-item { 
+        margin: 8px 0; 
+        display: flex; 
+        align-items: baseline; 
+    }
+    .detail-label { 
+        font-weight: 600; 
+        color: #2c3e50; 
+        min-width: 160px; 
+        margin-right: 10px; 
+    }
+    .fuels-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+        gap: 10px; 
+        margin-top: 10px; 
+    }
+    .fuel-card { 
+        background: white; 
+        padding: 10px; 
+        border-radius: 8px; 
+        border-left: 4px solid #586d85; 
+    }
+    .fuel-price {
+        font-size: 1.2em; 
+        color: #2c3e50; 
+        font-weight: bold; 
+    }
+    .fuel-timestamp { 
+        font-size: 0.8em; 
+        color: #666; 
+    }
+    .geo-grid {
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 15px; 
+        margin: 10px 0; 
+    }
+    .brand-info { 
+        background: #e3f2fd; 
+        padding: 8px; 
+        border-radius: 6px; 
+        margin: 10px 0; 
+    }
+    .general-info {
+        margin-top: 10px; 
+        color: #2c3e50; 
+        font-size: 0.9em; 
+    }
+    .error { 
+        color: red; 
+        font-size: 0.9em; 
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>⛽ Fuel Stations Map</h1>
+    <div id="generalInfo" class="general-info">🔄 Αναζήτηση τοποθεσίας...</div>
+</header>
+
+<div id="container">
+    <div id="leftDiv">
+    <button id="loadXML">📥 Φόρτωση XML</button>
+    <button id="loadJSON">📥 Φόρτωση JSON</button>
+    <button id="clearBtn">🧹 Καθαρισμός</button>
+    </div>
+    <div id="rightDiv">
+    <p>Δεδομένα πρατηρίων εδώ...</p>
+    </div>
+</div>
+
+<script>
+    let userCoords = null;
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function clearRightDiv() {
+    document.getElementById('rightDiv').innerHTML = '<p>Δεδομένα πρατηρίων εδώ...</p>';
+    }
+
+    function handleLocationError(error) {
+    document.getElementById('generalInfo').innerHTML =
+        '⚠️ Δεν δόθηκε άδεια για χρήση τοποθεσίας ή προέκυψε σφάλμα.';
+    }
+
+    function loadData(dataSource, isXML) {
+    clearRightDiv();
+
+    if (!userCoords) {
+        document.getElementById('generalInfo').innerHTML = '⚠️ Η τοποθεσία χρήστη δεν είναι διαθέσιμη.';
+        return;
+    }
+
+    const localTime = new Date().toLocaleString('el-GR');
+
+    fetch(dataSource)
+        .then(response => isXML ? response.text() : response.json())
+        .then(data => {
+        document.getElementById('generalInfo').innerHTML = `
+        📍 Χρήστης: ${userCoords.lat.toFixed(6)}, ${userCoords.lon.toFixed(6)}
+        | 🕒 ${localTime}
+        | 📢 ${isXML ?
+    new DOMParser().parseFromString(data, "text/xml").getElementsByTagName('msg')[0].textContent :
+    data.stations.msg}
+    `;
+
+    let html = '<div class="station-container">';
+    const processStation = (station) => {
+    const stationLat = isXML ?
+        parseFloat(station.getElementsByTagName('geolocation')[0].getAttribute('lat')) :
+        parseFloat(station.geolocation.lat);
+    const stationLon = isXML ?
+        parseFloat(station.getElementsByTagName('geolocation')[0].getAttribute('long')) :
+        parseFloat(station.geolocation.long);
+
+    if (isNaN(stationLat) || isNaN(stationLon)) {
+        html += `<div class="error">⚠️ Μη έγκυρες συντεταγμένες πρατηρίου</div>`;
+    return;
+        }
+
+    const distance = calculateDistance(userCoords.lat, userCoords.lon, stationLat, stationLon);
+
+    html += `
+    <div class="station-card">
+    <div class="station-header">
+    <h3>🚗 ${isXML ? station.getElementsByTagName('companyName')[0].textContent : station.companyName}</h3>
+        ${(isXML ? station.getElementsByTagName('h24')[0].textContent : station.h24) === 'true' ? '<span class="h24-tag">24ωρο 🌟</span>' : ''}
+    </div>
+        <div class="brand-info">
+            🏷️ Brand: ${isXML ? station.getElementsByTagName('brand')[0].textContent : station.brand["#text"]}
+        (Κωδικός: ${isXML ? station.getElementsByTagName('brand')[0].getAttribute('brandID') : station.brand.brandID})
+    </div>
+        <div class="geo-grid">
+        <div class="detail-item"><span class="detail-label">🗺️ Νομός:</span>
+            ${isXML ? station.getElementsByTagName('county')[0].textContent + ' (' + station.getElementsByTagName('county')[0].getAttribute('countyID') + ')' : station.county["#text"] + ' (' + station.county.countyID + ')'}
+        </div>
+        <div class="detail-item"><span class="detail-label">🏙️ Δήμος:</span>
+            ${isXML ? station.getElementsByTagName('municipality')[0].textContent + ' (' + station.getElementsByTagName('municipality')[0].getAttribute('municipalityID') + ')' : station.municipality["#text"] + ' (' + station.municipality.municipalityID + ')'}
+    </div>
+        <div class="detail-item"><span class="detail-label">🏘️ Δ.Διαμέρισμα:</span>
+            ${isXML ? station.getElementsByTagName('dd')[0].textContent + ' (' + station.getElementsByTagName('dd')[0].getAttribute('ddID') + ')' : station.dd["#text"] + ' (' + station.dd.ddID + ')'}
+    </div>
+    </div>
+        <div class="detail-item"><span class="detail-label">📍 Διεύθυνση:</span>
+            ${isXML ? station.getElementsByTagName('address')[0].textContent : station.address}
+    </div>
+        <div class="detail-item"><span class="detail-label">📏 Απόσταση:</span>
+        ${distance.toFixed(2)} km 
+    </div>
+        <div class="detail-item"><span class="detail-label">📌 Συντεταγμένες:</span>
+        ${stationLat.toFixed(6)}, ${stationLon.toFixed(6)}
+    </div>
+        <div class="detail-item"><span class="detail-label">📞 Τηλέφωνα:</span>
+        ${isXML ? Array.from(station.getElementsByTagName('phone')).map(p => p.textContent).join(', ') : station.phone.join(', ')}
+    </div>
+        <div class="fuels-header">⛽ Καύσιμα:</div>
+        <div class="fuels-grid">
+        ${(isXML ?
+            Array.from(station.getElementsByTagName('fuel')) :
+        station.fuel
+        ).map(fuel => `
+    <div class="fuel-card">
+    <div class="fuel-name">${isXML ? fuel.getElementsByTagName('fuelName')[0].textContent : fuel.fuelName}</div>
+    <div class="fuel-price">${isXML ? fuel.getElementsByTagName('price')[0].textContent : fuel.price} €/L</div>
+    <div class="fuel-timestamp">🕒 ${isXML ? fuel.getElementsByTagName('priceTimeStamp')[0].textContent : fuel.priceTimeStamp}</div>
+                    </div>
+        `).join('')}
+                </div>
+    </div>
+            `;
+    };
+
+    if (isXML) {
+        const xmlDoc = new DOMParser().parseFromString(data, "text/xml");
+        Array.from(xmlDoc.getElementsByTagName('station')).forEach(processStation);
+    } else {
+        data.stations.station.forEach(processStation);
+    }
+
+        document.getElementById('rightDiv').innerHTML = html + '</div>';
+        })
+        .catch(() => {
+        document.getElementById('rightDiv').innerHTML = '<div class="error">⚠️ Σφάλμα φόρτωσης δεδομένων</div>';
+        });
+    }
+
+    function requestUserLocationAndLoadData() {
+    navigator.geolocation.getCurrentPosition(
+    position => {
+        userCoords = {
+        lat: position.coords.latitude,
+        lon: position.coords.longitude
+    };
+        loadData('fuel.json', false); // 🔄 JSON ως προεπιλογή
+    },
+        handleLocationError,
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+    }
+
+    document.getElementById('loadXML').addEventListener('click', () => loadData('fuel.xml', true));
+    document.getElementById('loadJSON').addEventListener('click', () => loadData('fuel.json', false));
+    document.getElementById('clearBtn').addEventListener('click', clearRightDiv);
+
+    window.onload = requestUserLocationAndLoadData;
+</script>
+</body>
+</html>
